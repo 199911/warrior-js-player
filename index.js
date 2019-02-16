@@ -7,24 +7,13 @@ const getOppDir = (dir) => {
   }
 }
 
-const isEnemyInDistance = (objects) => {
-  for (let i =0; i < objects.length; i++ ) {
-    switch (objects[i]) {
-      case 'enemy':
-        return true;
-      case 'bound':
-        return false;
-    }
-  }
-}
-
-const isEnemyInDistance = (objects) => {
-  for (let i =0; i < objects.length; i++ ) {
-    switch (objects[i]) {
-      case 'enemy':
-        return true;
-      case 'bound':
-        return false;
+const nextObject = (objects) => {
+  for (let i = 0; i < objects.length; i++ ) {
+    if (objects[i] !== 'empty') {
+      return {
+        type: objects[i],
+        dist: i,
+      };
     }
   }
   return false;
@@ -35,8 +24,9 @@ class Player {
     this.pre(war);
     const sight = war.look(this.dir);
     const objects = sight.map(this.identify);
-    war.think(objects.join(','));
-    if (isEnemyInDistance(objects)) {
+    const { type, dist } = nextObject(objects);
+    war.think(nextObject(objects));
+    if (type === 'enemy') {
       war.shoot(this.dir);
     } else {
       switch (objects[0]) {
