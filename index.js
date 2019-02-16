@@ -34,7 +34,7 @@ class Player {
   playTurn(war) {
     this.pre(war);
     const sight = war.look(this.dir);
-    const objects = sight.map(this.feel);
+    const objects = sight.map(this.identify);
     war.think(objects.join(','));
     switch (objects[0]) {
       case 'wall':
@@ -77,7 +77,7 @@ class Player {
     this.hp = war.health();
   }
 
-  feel(space) {
+  identify(space) {
     if (space.isEmpty()) {
       return 'empty';
     }
