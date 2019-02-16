@@ -22,40 +22,61 @@ const nextObject = (objects) => {
 class Player {
   playTurn(war) {
     this.pre(war);
-    const sight = war.look(this.dir);
-    const objects = sight.map(this.identify);
-    const { type, dist } = nextObject(objects);
-    war.think(nextObject(objects));
-    if (type === 'enemy') {
-      war.shoot(this.dir);
-    } else {
-      switch (objects[0]) {
-        case 'enemy':
-          war.attack(this.dir);
-          break;
-        case 'bound':
-          war.rescue(this.dir);
-          break;
-        case 'stairs':
-          war.walk(this.dir);
-          break;
-        case 'wall':
-          war.pivot();
-          break;
-        case 'empty':
-          if (this.isBleeding(war)) {
-            if (this.isDanger(war)) {
-              this.turn();
+    if (!this.actBackward(war)) {
+      const sight = war.look(this.dir);
+      const objects = sight.map(this.identify);
+      const { type, dist } = nextObject(objects);
+      war.think(nextObject(objects));
+      if (type === 'enemy') {
+        war.shoot(this.dir);
+      } else {
+        switch (objects[0]) {
+          case 'enemy':
+            war.attack(this.dir);
+            break;
+          case 'bound':
+            war.rescue(this.dir);
+            break;
+          case 'stairs':
+            war.walk(this.dir);
+            break;
+          case 'wall':
+            war.pivot();
+            break;
+          case 'empty':
+            if (this.isBleeding(war)) {
+              if (this.isDanger(war)) {
+                this.turn();
+              }
+              war.walk(this.dir);
+            } else if (this.isHurt(war)) {
+              war.rest();
+            } else {
+              war.walk(this.dir);
             }
-            war.walk(this.dir);
-          } else if (this.isHurt(war)) {
-            war.rest();
-          } else {
-            war.walk(this.dir);
-          }
+        }
       }
     }
     this.post(war);
+  }
+
+  actBackward(war) {
+    const dir = 'backward';
+    const sight = war.look(dir);
+    const objects = sight.map(this.identify);
+    const { type, dist } = nextObject(objects);
+    war.think(nextObject(objects));
+    switch (type) {
+      case 'enemy':
+        dist > 0 ? war.shoot(dir) : war.attack(dir);
+        break;
+      case 'bound':
+        dist > 0 ? war.walk(dir) : war.rescue(dir);
+        break;
+      default:
+        return false;
+    }
+    return true;
   }
 
   pre(war) {
