@@ -36,31 +36,31 @@ class Player {
     const sight = war.look(this.dir);
     const objects = sight.map(this.identify);
     war.think(objects.join(','));
-    switch (objects[0]) {
-      case 'wall':
-        war.pivot();
-        break;
-      case 'enemy':
-        war.attack(this.dir);
-        break;
-      case 'bound':
-        war.rescue(this.dir);
-        break;
-      case 'empty':
-        if (this.isBleeding(war)) {
-          if (this.isDanger(war)) {
-            this.turn();
-          }
-          war.walk(this.dir);
-        } else if (this.isHurt(war)) {
-          war.rest();
-        } else {
-          if (objects.includes('enemy')) {
-            war.shoot(this.dir);
+    if (isEnemyInDistance(objects)) {
+      war.shoot(this.dir);
+    } else {
+      switch (objects[0]) {
+        case 'wall':
+          war.pivot();
+          break;
+        case 'enemy':
+          war.attack(this.dir);
+          break;
+        case 'bound':
+          war.rescue(this.dir);
+          break;
+        case 'empty':
+          if (this.isBleeding(war)) {
+            if (this.isDanger(war)) {
+              this.turn();
+            }
+            war.walk(this.dir);
+          } else if (this.isHurt(war)) {
+            war.rest();
           } else {
             war.walk(this.dir);
           }
-        }
+      }
     }
     this.post(war);
   }
