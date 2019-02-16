@@ -30,7 +30,7 @@ class Player {
       case 'empty':
         if (this.isBleeding(war)) {
           if (this.isDanger(war)) {
-            this.dir = getOppDir(this.dir);
+            this.turn();
           }
           war.walk(this.dir);
         } else if (this.isHurt(war)) {
@@ -54,7 +54,6 @@ class Player {
       this.dir = 'forward';
     }
   }
-
   post(war) {
     this.hp = war.health();
   }
@@ -76,6 +75,9 @@ class Player {
     }
   }
 
+  turn() {
+    this.dir = getOppDir(this.dir);
+  }
   isHurt(war) {
     return war.health() < war.maxHealth();
   }
