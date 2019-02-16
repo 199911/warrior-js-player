@@ -7,10 +7,32 @@ const getOppDir = (dir) => {
   }
 }
 
+const isEnemyInDistance = (objects) => {
+  for (let i =0; i < objects.length; i++ ) {
+    switch (objects[i]) {
+      case 'enemy':
+        return true;
+      case 'bound':
+        return false;
+    }
+  }
+}
+
+const isEnemyInDistance = (objects) => {
+  for (let i =0; i < objects.length; i++ ) {
+    switch (objects[i]) {
+      case 'enemy':
+        return true;
+      case 'bound':
+        return false;
+    }
+  }
+  return false;
+}
+
 class Player {
   playTurn(war) {
     this.pre(war);
-    war.think(this.dir);
     const sight = war.look(this.dir);
     const objects = sight.map(this.feel);
     war.think(objects.join(','));
