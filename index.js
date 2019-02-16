@@ -30,14 +30,17 @@ class Player {
       war.shoot(this.dir);
     } else {
       switch (objects[0]) {
-        case 'wall':
-          war.pivot();
-          break;
         case 'enemy':
           war.attack(this.dir);
           break;
         case 'bound':
           war.rescue(this.dir);
+          break;
+        case 'stairs':
+          war.walk(this.dir);
+          break;
+        case 'wall':
+          war.pivot();
           break;
         case 'empty':
           if (this.isBleeding(war)) {
@@ -68,12 +71,6 @@ class Player {
   }
 
   identify(space) {
-    if (space.isEmpty()) {
-      return 'empty';
-    }
-    if (space.isWall()) {
-      return 'wall';
-    }
     if (space.isUnit()) {
       if (space.getUnit().isEnemy()) {
         return 'enemy';
@@ -81,6 +78,15 @@ class Player {
       if (space.getUnit().isBound()) {
         return 'bound'
       }
+    }
+    if (space.isEmpty()) {
+      if (space.isStairs()) {
+        return 'stairs';
+      }
+      return 'empty';
+    }
+    if (space.isWall()) {
+      return 'wall';
     }
   }
 
