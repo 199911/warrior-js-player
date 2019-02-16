@@ -22,42 +22,44 @@ const nextObject = (objects) => {
 class Player {
   playTurn(war) {
     this.pre(war);
-    if (!this.actBackward(war)) {
-      const sight = war.look(this.dir);
-      const objects = sight.map(this.identify);
-      const { type, dist } = nextObject(objects);
-      war.think(nextObject(objects));
-      if (type === 'enemy') {
-        war.shoot(this.dir);
-      } else {
-        switch (objects[0]) {
-          case 'enemy':
-            war.attack(this.dir);
-            break;
-          case 'bound':
-            war.rescue(this.dir);
-            break;
-          case 'stairs':
-            war.walk(this.dir);
-            break;
-          case 'wall':
-            war.pivot();
-            break;
-          case 'empty':
-            if (this.isBleeding(war)) {
-              if (this.isDanger(war)) {
-                this.turn();
-              }
-              war.walk(this.dir);
-            } else if (this.isHurt(war)) {
-              war.rest();
-            } else {
-              war.walk(this.dir);
-            }
-        }
-      }
-    }
+    this.actBackward(war) || this.actForward(war);
     this.post(war);
+  }
+
+  actForward(war) {
+    const sight = war.look();
+    const objects = sight.map(this.identify);
+    const obj = nextObject(objects);
+    if (!obj) {
+      if (this.isBleeding(war)) {
+        if (this.isDanger(war)) {
+          this.turn();
+        }
+        war.walk();
+      } else if (this.isHurt(war)) {
+        war.rest();
+      } else {
+        war.walk();
+      }
+      return true;
+    }
+    const { type, dist } = obj;
+    war.think(`forward ${type} ${dist}`);
+    switch (type) {
+      case 'enemy':
+        dist > 0 ? war.shoot() : war.attack();
+        break;
+      case 'bound':
+        dist > 0 ? war.walk() : war.rescue();
+        break;
+      case 'stairs':
+        war.walk(this.dir);
+        break;
+      case 'wall':
+        war.pivot();
+        break;
+    }
+    return true;
   }
 
   actBackward(war) {
@@ -65,7 +67,7 @@ class Player {
     const sight = war.look(dir);
     const objects = sight.map(this.identify);
     const { type, dist } = nextObject(objects);
-    war.think(nextObject(objects));
+    war.think(`backward ${type} ${dist}`);
     switch (type) {
       case 'enemy':
         dist > 0 ? war.shoot(dir) : war.attack(dir);
