@@ -11,13 +11,10 @@ class Player {
   playTurn(war) {
     this.pre(war);
     war.think(this.dir);
-    const space = war.feel(this.dir);
-    const object = this.feel(space);
-    war.think(object);
     const sight = war.look(this.dir);
-    const objs = sight.map(this.feel);
-    war.think(objs);
-    switch (object) {
+    const objects = sight.map(this.feel);
+    war.think(objects.join(','));
+    switch (objects[0]) {
       case 'wall':
         war.pivot();
         break;
@@ -36,7 +33,7 @@ class Player {
         } else if (this.isHurt(war)) {
           war.rest();
         } else {
-          if (objs.includes('enemy')) {
+          if (objects.includes('enemy')) {
             war.shoot(this.dir);
           } else {
             war.walk(this.dir);
